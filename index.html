@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>tiervermisst.at – gefundene Tiere in Wien</title>
+<meta name="description" content="Alle in Wien gefundenen Haustiere mit Foto, Fundort und Kontakt. Nach Tierart, Bezirk und Farbe filtern. Daten der Stadt Wien, automatisch aktualisiert.">
+<style>
+:root{
+  --bg:#EEF1EC; --card:#FFFFFF; --ink:#18302B; --muted:#5E6F69; --line:#CBD3CC;
+  --brass:#E2B13C; --brass-ink:#3A2A05; --chip:#DFE5DE; --focus:#1F6FEB;
+  --display:ui-rounded,"SF Pro Rounded","Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121A18; --card:#1B2522; --ink:#E6EDE9; --muted:#9AABA4; --line:#2E3C38;
+    --brass:#D9A93A; --brass-ink:#241900; --chip:#24312D; --focus:#79A8FF;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121A18; --card:#1B2522; --ink:#E6EDE9; --muted:#9AABA4; --line:#2E3C38;
+  --brass:#D9A93A; --brass-ink:#241900; --chip:#24312D; --focus:#79A8FF;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+/* Kopf */
+header{padding:44px 0 28px}
+.head{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(2.2rem,6vw,4rem);line-height:1;letter-spacing:-.02em;margin:0 0 14px;max-width:14ch}
+.lead{margin:0;color:var(--muted);max-width:60ch}
+.lead strong{color:var(--ink)}
+.stale{margin:12px 0 0;background:var(--brass);color:var(--brass-ink);border-radius:10px;padding:10px 14px;max-width:60ch;font-weight:700}
+.hotline{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px;min-width:250px}
+.hotline p{margin:0;font-size:.92rem;color:var(--muted)}
+.hotline a{display:block;font-family:var(--display);font-weight:700;font-size:1.35rem;text-decoration:none;margin:2px 0}
+@media (max-width:760px){.head{grid-template-columns:1fr}.hotline{min-width:0}}
+
+/* Filter */
+.filters{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:12px 0 14px;border-bottom:1px solid var(--line)}
+.kinds{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;scrollbar-width:thin}
+.kind{flex:0 0 auto;display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:8px 14px 8px 12px;font:600 1rem var(--display);cursor:pointer}
+.kind svg{width:22px;height:22px}
+.kind .n{font-family:var(--body);font-weight:400;font-size:.85rem;color:var(--muted)}
+.kind[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.kind[aria-pressed="true"] .n{color:inherit;opacity:.75}
+.row{display:grid;grid-template-columns:2fr repeat(4,1fr) auto;gap:10px;align-items:end}
+.row label{display:flex;flex-direction:column;gap:3px;font-size:.82rem;color:var(--muted)}
+.row input,.row select{font:inherit;font-size:.95rem;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0;width:100%}
+.reset{font:inherit;font-size:.95rem;background:none;border:none;color:var(--ink);text-decoration:underline;cursor:pointer;padding:9px 4px}
+@media (max-width:900px){.filters{position:static}.row{grid-template-columns:1fr 1fr}.row .search{grid-column:1/-1}.reset{justify-self:start}}
+
+/* Ergebnis */
+.summary{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:20px 0 14px;color:var(--muted)}
+.summary b{color:var(--ink);font-family:var(--display);font-size:1.15rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:40px}
+.card{position:relative;overflow:visible;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;display:flex;flex-direction:column;gap:10px}
+.tag{position:absolute;top:-9px;right:16px;transform:rotate(3deg);background:var(--brass);color:var(--brass-ink);border-radius:8px 8px 8px 8px;padding:5px 12px 5px 26px;font:700 .9rem var(--display);letter-spacing:.02em}
+.tag::before{content:"";position:absolute;left:9px;top:50%;width:9px;height:9px;margin-top:-4.5px;border-radius:50%;background:var(--card);box-shadow:inset 0 0 0 1.5px rgba(0,0,0,.25)}
+.kindline{display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--muted)}
+.kindline svg{width:18px;height:18px}
+.card h2{font-family:var(--display);font-weight:700;font-size:1.3rem;line-height:1.15;margin:0}
+.colors{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sw{display:inline-flex;gap:3px}
+.sw i{width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,.25);display:block}
+.facts{display:flex;flex-wrap:wrap;gap:6px}
+.fact{background:var(--chip);border-radius:6px;padding:2px 8px;font-size:.88rem}
+dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:.95rem}
+dt{color:var(--muted)}
+dd{margin:0}
+.when{font-weight:700}
+.contact{border-top:1px dashed var(--line);padding-top:10px;font-size:.92rem}
+.contact .org{font-weight:700}
+.contact a{word-break:break-word}
+.actions{display:flex;gap:16px;flex-wrap:wrap;margin-top:2px}
+.actions a{font-weight:700}
+.photo{margin:-18px -18px 2px;aspect-ratio:4/3;background:var(--chip);border-radius:14px 14px 0 0;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:var(--muted);font-size:.92rem}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.photo .fb{display:none}
+.photo.fail img{display:none}
+.photo.fail .fb,.photo.none .fb{display:flex;flex-direction:column;align-items:center;gap:6px}
+.photo.fail,.photo.none{aspect-ratio:auto;padding:28px 12px}
+.photo .fb svg{width:34px;height:34px;opacity:.5}
+.photo .fb a{font-weight:700;color:var(--ink)}
+.tag{z-index:2}
+.nophoto{color:var(--muted);font-size:.9rem}
+.empty{grid-column:1/-1;background:var(--card);border:1.5px dashed var(--line);border-radius:14px;padding:28px;text-align:center}
+.empty button{margin-top:10px}
+
+
+/* Ansicht-Umschalter */
+.views{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.view{font:700 1.05rem var(--display);border:1.5px solid var(--ink);background:transparent;color:var(--ink);border-radius:10px;padding:8px 16px;cursor:pointer}
+.view .n{font:400 .85rem var(--body);opacity:.75;margin-left:4px}
+.view[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.btn{font:700 1rem var(--display);border:none;border-radius:10px;padding:10px 16px;cursor:pointer;background:var(--ink);color:var(--bg)}
+.btn.sec{background:var(--chip);color:var(--ink)}
+.btn.small{font-size:.9rem;padding:7px 12px}
+.btn:disabled{opacity:.5;cursor:default}
+.hotline .btn{margin-top:12px;width:100%}
+.card.lost{border-color:var(--ink);border-width:1.5px}
+.tag.lostTag{background:var(--ink);color:var(--bg);padding-left:12px}
+.tag.lostTag::before{display:none}
+.pill{display:inline-block;border-radius:6px;padding:2px 8px;font-size:.85rem;font-weight:700;background:var(--brass);color:var(--brass-ink)}
+.pill.grey{background:var(--chip);color:var(--ink)}
+.desc{margin:0;font-size:.95rem}
+.matches{border-top:1px dashed var(--line);padding-top:10px}
+.matches h3{font:700 1rem var(--display);margin:0 0 6px}
+.matches p{margin:0;font-size:.9rem;color:var(--muted)}
+.mlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.mbtn{width:100%;text-align:left;font:inherit;font-size:.92rem;background:var(--chip);color:var(--ink);border:none;border-radius:8px;padding:8px 10px;cursor:pointer}
+.mbtn b{font-family:var(--display)}
+.hint{font:700 .9rem var(--body);background:var(--ink);color:var(--bg);border:none;border-radius:8px;padding:8px 10px;cursor:pointer;text-align:left}
+.ownbar{display:flex;flex-wrap:wrap;gap:8px;border-top:1px dashed var(--line);padding-top:10px}
+.section-title{font:800 1.5rem var(--display);margin:26px 0 4px}
+.section-note{margin:0 0 14px;color:var(--muted);max-width:70ch}
+.notice{grid-column:1/-1;background:var(--card);border:1.5px dashed var(--line);border-radius:14px;padding:22px}
+.notice p{margin:0 0 10px;max-width:70ch}
+.flash{outline:3px solid var(--brass);outline-offset:3px}
+dialog{border:none;border-radius:16px;padding:0;max-width:640px;width:calc(100% - 24px);background:var(--card);color:var(--ink)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:.9rem;color:var(--muted)}
+.form .full{grid-column:1/-1}
+.form input,.form select,.form textarea{font:inherit;font-size:.98rem;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;width:100%}
+.form textarea{min-height:80px;resize:vertical}
+.form fieldset{border:1.5px solid var(--line);border-radius:10px;padding:8px 10px 10px;margin:0}
+.form legend{font-size:.9rem;color:var(--muted);padding:0 4px}
+.cboxes{display:flex;flex-wrap:wrap;gap:6px 14px}
+.cboxes label{flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:.95rem}
+.cboxes input{width:auto}
+.consent{flex-direction:row !important;align-items:flex-start;gap:8px !important;color:var(--ink) !important}
+.consent input{width:auto;margin-top:4px}
+.warn{font-size:.85rem;color:var(--muted)}
+.preview{max-width:160px;border-radius:10px;display:none}
+.err{color:#B3261E;font-weight:700;margin:10px 0 0}
+@media (max-width:600px){.form{grid-template-columns:1fr}}
+.steps{display:flex;flex-direction:column;gap:12px;margin-bottom:10px}
+.step{display:flex;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.step .num{flex:0 0 auto;width:40px;height:40px;border-radius:50%;background:var(--brass);color:var(--brass-ink);display:flex;align-items:center;justify-content:center;font:800 1.2rem var(--display)}
+.step h3,.case h3{font:700 1.15rem var(--display);margin:0 0 4px}
+.step p,.case p{margin:0;max-width:70ch}
+.step .big{font:800 1.4rem var(--display);text-decoration:none}
+.cases{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.case{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+#info{padding-bottom:40px}
+#info .btn{margin-top:4px}
+footer{border-top:1px solid var(--line);padding:22px 0 34px;color:var(--muted);font-size:.9rem}
+footer p{margin:0 0 6px;max-width:80ch}
+@media (prefers-reduced-motion:no-preference){.card{animation:in .25s ease-out both}@keyframes in{from{opacity:0;transform:translateY(4px)}}}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <div class="head">
+    <div>
+      <h1>Dein Tier wird vermisst?</h1>
+      <p class="lead">Hier siehst du alle Tiere, die in Wien gefunden und beim Fundservice gemeldet wurden. Wenn du dein Tier erkennst, notiere die Fund-ID und melde dich bei der angegebenen Stelle. <strong id="stand">Daten werden geladen …</strong></p>
+      <p class="stale" id="stale" role="status" hidden></p>
+    </div>
+    <div class="hotline">
+      <p>Fundservice für Haustiere, rund um die Uhr</p>
+      <a href="tel:+43140008060">+43 1 4000-8060</a>
+      <p>Für gefundene Tiere und um dein Tier als vermisst zu melden.</p>
+      <button class="btn" type="button" data-view="info">Ich habe ein Tier gefunden</button>
+    </div>
+  </div>
+</header>
+
+<section class="filters" aria-label="Filter">
+  <div class="wrap">
+    <div class="views" role="group" aria-label="Ansicht">
+      <button type="button" class="view" data-view="found" aria-pressed="true">Gefundene Tiere<span class="n" id="nFound"></span></button>
+      <button type="button" class="view" data-view="info" aria-pressed="false">Ich habe ein Tier gefunden</button>
+    </div>
+    <div id="filterArea"><div class="kinds" id="kinds" role="group" aria-label="Tierart"></div>
+    <div class="row">
+      <label class="search">Suche
+        <input id="q" type="search" placeholder="Rasse, Farbe, Straße oder Fund-ID" autocomplete="off">
+      </label>
+      <label>Bezirk<select id="bez"></select></label>
+      <label>Farbe<select id="col"></select></label>
+      <label>Geschlecht
+        <select id="sex">
+          <option value="">Alle</option><option value="m">männlich</option><option value="w">weiblich</option><option value="u">unbekannt</option>
+        </select>
+      </label>
+      <label>Gefunden
+        <select id="age">
+          <option value="">Jederzeit</option><option value="3">Letzte 3 Tage</option><option value="7">Letzte 7 Tage</option><option value="14">Letzte 14 Tage</option><option value="30">Letzte 30 Tage</option>
+        </select>
+      </label>
+      <button class="reset" id="reset" type="button">Filter zurücksetzen</button>
+    </div></div>
+  </div>
+</section>
+
+<main class="wrap">
+  <section id="info" hidden>
+    <h2 class="section-title">Du hast ein Tier gefunden?</h2>
+    <p class="section-note">So kommt das Tier am schnellsten wieder nach Hause. Das Fundservice der Stadt Wien kümmert sich um alles Weitere, auch um die Abholung.</p>
+    <div class="steps">
+      <article class="step"><span class="num">1</span><div>
+        <h3>Fundservice anrufen</h3>
+        <p><a class="big" href="tel:+43140008060">+43 1 4000-8060</a>, täglich von 0 bis 24 Uhr. Das Fundservice nimmt deine Meldung auf und organisiert die Abholung. Untergebracht wird das Tier danach bei Partnern der Stadt Wien.</p>
+      </div></article>
+      <article class="step"><span class="num">2</span><div>
+        <h3>Fundort und Zeit merken</h3>
+        <p>Notier dir die genaue Adresse oder Kreuzung und die Uhrzeit, und mach wenn möglich ein Foto. Genau diese Angaben stehen später in der Fundliste, und an ihnen erkennen Besitzer ihr Tier wieder.</p>
+      </div></article>
+      <article class="step"><span class="num">3</span><div>
+        <h3>Das Tier nicht einfach behalten</h3>
+        <p>Auch wenn es zutraulich ist: Nur wenn das Tier gemeldet ist, kann der Besitzer es finden. In der Unterbringung wird zum Beispiel nach einem Chip gesucht, über den sich der Besitzer oft schnell ausfindig machen lässt.</p>
+      </div></article>
+    </div>
+
+    <h2 class="section-title">Je nach Tier</h2>
+    <div class="cases">
+      <article class="case"><h3>Hund, Katze, Kaninchen und andere Kleintiere</h3>
+        <p>Ruf das Fundservice an. Diese Tiere kommen in der Regel ins TierQuarTier Wien, das Tierheim der Stadt.</p></article>
+      <article class="case"><h3>Vogel, Schildkröte, Reptil</h3>
+        <p>Ebenfalls über das Fundservice. Für diese Tiere arbeitet die Stadt mit eigenen Partnern zusammen, zum Beispiel dem Zoo Forchtenstein.</p></article>
+      <article class="case"><h3>Verletztes Wildtier</h3>
+        <p>Verletzte Wildtiere, außer Fledermäusen, können zu bestimmten Zeiten in der Fundbox des Forst- und Landwirtschaftsbetriebs der Stadt Wien abgegeben werden: 10., Triester Straße 114. <a href="https://www.wien.gv.at/zusammenleben/tiere" target="_blank" rel="noopener">Infos der Stadt Wien zu Tieren</a></p></article>
+      <article class="case"><h3>Totes Tier</h3>
+        <p>Tot aufgefundene Tiere veröffentlicht in Wien das <a href="https://www.ebswien.at/tierservice/" target="_blank" rel="noopener">Tierservice der ebs.wien</a>. Dort findest du auch, wo du einen Fund melden kannst.</p></article>
+    </div>
+
+    <h2 class="section-title">Du kennst den Besitzer?</h2>
+    <p class="section-note">Wenn du ein Tier aus der Fundliste erkennst, notier dir die Fund-ID auf dem gelben Schild der Karte und ruf das Fundservice unter <a href="tel:+43140008060">+43 1 4000-8060</a> an.</p>
+    <button class="btn" type="button" data-view="found">Zur Liste der gefundenen Tiere</button>
+  </section>
+
+  <div id="listArea">
+  <div class="summary" aria-live="polite">
+    <span id="count"></span>
+    <label>Sortierung
+      <select id="sort" style="font:inherit;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);padding:3px 6px">
+        <option value="new">Neueste zuerst</option><option value="old">Älteste zuerst</option><option value="bez">Nach Bezirk</option>
+      </select>
+    </label>
+  </div>
+  <div class="grid" id="grid"></div>
+  </div>
+</main>
+
+
+<footer class="wrap">
+  <p>Quelle: Stadt Wien, Veterinäramt und Tierschutz (MA 60), Open-Data-Feed „Fund- und Vergabetiere“ auf data.gv.at, Lizenz CC BY 4.0. Die Daten werden automatisch alle 30 Minuten abgerufen.</p>
+  <p>Verbindlich ist die <a href="https://www.wien.gv.at/zusammenleben/fundservice-tiere" target="_blank" rel="noopener">Fundservice-Seite der Stadt Wien</a>. Gefundene Tiere werden dort 30 Tage lang veröffentlicht. Diese Seite ist ein privates, nicht-kommerzielles Angebot und kein Angebot der Stadt Wien.</p>
+  <p><a href="impressum.html">Impressum</a> &nbsp; <a href="datenschutz.html">Datenschutz</a></p>
+</footer>
+
+<script>
+
+const KINDS=[
+  {id:"",label:"Alle Tiere"},
+  {id:"k",label:"Katzen"},
+  {id:"h",label:"Hunde"},
+  {id:"v",label:"Vögel"},
+  {id:"n",label:"Kleintiere"},
+  {id:"r",label:"Reptilien"}
+];
+const KIND_ONE={k:"Katze",h:"Hund",v:"Vogel",n:"Kleintier",r:"Reptil"};
+const ICONS={
+  "":'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="6" cy="9" r="2.2"/><circle cx="10" cy="5.5" r="2.2"/><circle cx="14" cy="5.5" r="2.2"/><circle cx="18" cy="9" r="2.2"/><path d="M12 10.5c-3 0-6 4.6-6 7.2 0 1.9 1.6 2.6 3.2 2.1 1-.3 1.9-.6 2.8-.6s1.8.3 2.8.6c1.6.5 3.2-.2 3.2-2.1 0-2.6-3-7.2-6-7.2z"/></svg>',
+  k:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 3l4 4.2c1.2-.4 2.6-.7 4-.7s2.8.3 4 .7L20 3v8.5c0 5-3.6 9.5-8 9.5s-8-4.5-8-9.5z"/></svg>',
+  h:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 3c-2 0-4 1.6-4 4.5 0 2 .9 3.6 2 4.5V15c0 3.6 3.1 6 7 6s7-2.4 7-6v-3c1.1-.9 2-2.5 2-4.5C21 4.6 19 3 17 3c-1.3 0-2.3.7-2.9 1.5C13.4 4.2 12.7 4 12 4s-1.4.2-2.1.5C9.3 3.7 8.3 3 7 3z"/></svg>',
+  v:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15 3a4 4 0 0 0-4 4v2.2C7.7 10 5 12.9 5 16.5V21h3l1.5-2.5H14c3.9 0 7-3.1 7-7v-1l-2-1V7a4 4 0 0 0-4-4zm1 3.2a1 1 0 1 1 0 2 1 1 0 0 1 0-2zM21 6.5l2 1-2 1z"/></svg>',
+  n:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 2c1.4 0 2 2.4 2 5.2 0 .5 0 1-.1 1.4.7-.2 1.4-.3 2.1-.3s1.4.1 2.1.3c-.1-.4-.1-.9-.1-1.4C14 4.4 14.6 2 16 2s2 2.6 1.6 6c-.1.9-.4 1.8-.7 2.5C18.8 11.7 20 13.6 20 16c0 3.3-3.6 6-8 6s-8-2.7-8-6c0-2.4 1.2-4.3 3.1-5.5-.3-.7-.6-1.6-.7-2.5C6 4.6 6.6 2 8 2z"/></svg>',
+  r:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 5c-4.4 0-8 3-8 7 0 .7.1 1.3.3 1.9L2 15l1 2 2.3-1c1.4 1.8 3.9 3 6.7 3s5.3-1.2 6.7-3l2.3 1 1-2-2.3-1.1c.2-.6.3-1.2.3-1.9 0-4-3.6-7-8-7z"/><circle cx="21" cy="10" r="1.8"/></svg>'
+};
+const BEZIRKE=["","Innere Stadt","Leopoldstadt","Landstraße","Wieden","Margareten","Mariahilf","Neubau","Josefstadt","Alsergrund","Favoriten","Simmering","Meidling","Hietzing","Penzing","Rudolfsheim-Fünfhaus","Ottakring","Hernals","Währing","Döbling","Brigittenau","Floridsdorf","Donaustadt","Liesing"];
+const SEX={m:"männlich",w:"weiblich",u:"Geschlecht unbekannt"};
+
+// Farbwörter -> Farbpunkte und Farbfilter
+const COLORS=[
+  {id:"schwarz",label:"Schwarz",hex:"#1d1d1d",re:/schwarz/},
+  {id:"weiss",label:"Weiß",hex:"#ffffff",re:/wei(ß|ss)/},
+  {id:"grau",label:"Grau",hex:"#8b9195",re:/grau/},
+  {id:"hellbraun",label:"Hellbraun",hex:"#b8875a",re:/hellbraun/},
+  {id:"braun",label:"Braun",hex:"#74482a",re:/(^|[^l])braun/},
+  {id:"rot",label:"Rot / Orange",hex:"#d0712f",re:/(^|[\s\/,-])rot/},
+  {id:"beige",label:"Beige",hex:"#dcc6a2",re:/beige/},
+  {id:"gelb",label:"Gelb",hex:"#f0c22e",re:/gelb/},
+  {id:"gruen",label:"Grün",hex:"#57a04a",re:/grün/},
+  {id:"blau",label:"Blau",hex:"#3f6fd0",re:/blau/},
+  {id:"violett",label:"Violett",hex:"#7c5aa6",re:/violett/}
+];
+const MULTI=/tricolor|schildpatt|dreifärbig/;
+function colorIds(txt){
+  const t=(txt||"").toLowerCase();
+  let ids=COLORS.filter(c=>c.re.test(t)).map(c=>c.id);
+  if(MULTI.test(t)) ids=["schwarz","rot","weiss",...ids];
+  return [...new Set(ids)];
+}
+
+let ANIMALS=[];
+function fromIso(x){const [y,m,d]=String(x).split("-").map(Number);return new Date(y,(m||1)-1,d||1)}
+function prep(a){
+  const color=(a.color||"").trim();
+  return {...a,color,date:fromIso(a.date),bez:+a.bez||0,cids:colorIds(color),
+    striped:/getigert|gestromt/.test(color.toLowerCase()),
+    hay:[a.id,a.title,color,a.street,BEZIRKE[a.bez]||"",KIND_ONE[a.kind]||""].join(" ").toLowerCase()};
+}
+
+const $=s=>document.querySelector(s);
+const state={view:"found",kind:"",q:"",bez:"",col:"",sex:"",age:"",sort:"new"};
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function daysAgo(d){const now=new Date();now.setHours(0,0,0,0);return Math.round((now-d)/864e5)}
+function fmtDate(d){return d.toLocaleDateString("de-AT",{day:"numeric",month:"long"})}
+function relDate(d){const n=daysAgo(d);if(n<=0)return"heute";if(n===1)return"gestern";return"vor "+n+" Tagen"}
+
+function applyFilters(list,ignore){
+  const q=state.q.trim().toLowerCase();
+  return list.filter(a=>{
+    if(ignore!=="kind"&&state.kind&&a.kind!==state.kind)return false;
+    if(state.bez&&a.bez!==+state.bez)return false;
+    if(state.col&&!a.cids.includes(state.col))return false;
+    if(state.sex&&a.sex!==state.sex)return false;
+    if(state.age&&daysAgo(a.date)>+state.age)return false;
+    if(q&&!q.split(/\s+/).every(w=>a.hay.includes(w)))return false;
+    return true;
+  });
+}
+function renderKinds(){
+  const base=applyFilters(ANIMALS,"kind");
+  $("#kinds").innerHTML=KINDS.map(k=>{
+    const n=k.id?base.filter(a=>a.kind===k.id).length:base.length;
+    return `<button type="button" class="kind" data-k="${k.id}" aria-pressed="${state.kind===k.id}">${ICONS[k.id]}${k.label}<span class="n">${n}</span></button>`;
+  }).join("");
+}
+function swatches(a){
+  if(!a.cids.length)return"";
+  return `<span class="sw" aria-hidden="true">`+a.cids.map(id=>{
+    const c=COLORS.find(x=>x.id===id);
+    const bg=a.striped?`repeating-linear-gradient(135deg,${c.hex} 0 3px,rgba(0,0,0,.35) 3px 5px)`:c.hex;
+    return `<i style="background:${bg}"></i>`;
+  }).join("")+`</span>`;
+}
+function card(a){
+  const o=a.org||{};
+  const facts=[SEX[a.sex]];
+  if(a.born)facts.push("Geburtsjahr "+a.born);
+  if(a.mix)facts.push("Mischling");
+  const url=a.img||a.photoUrl||"";
+  const photo=url
+    ?`<figure class="photo"><img src="${url}" alt="Foto: ${esc(a.title)}, ${esc(a.color||KIND_ONE[a.kind])}" loading="lazy"><span class="fb">${ICONS[a.kind]}<a href="${url}" target="_blank" rel="noopener">Foto ansehen</a></span></figure>`
+    :`<figure class="photo none"><span class="fb">${ICONS[a.kind]}<span>Kein Foto vorhanden</span></span></figure>`;
+  return `<article class="card" id="f-${a.id}">
+    <span class="tag" title="Fund-ID">${a.id}</span>
+    ${photo}
+    <span class="kindline">${ICONS[a.kind]}${KIND_ONE[a.kind]}</span>
+    <h2>${esc(a.title)}</h2>
+    <div class="colors">${swatches(a)}<span>${a.color?esc(a.color):"Farbe nicht angegeben"}</span></div>
+    <div class="facts">${facts.map(f=>`<span class="fact">${esc(f)}</span>`).join("")}</div>
+    <dl>
+      <dt>Gefunden</dt><dd><span class="when">${relDate(a.date)}</span>, ${fmtDate(a.date)}</dd>
+      <dt>Fundort</dt><dd>${esc(a.street)}<br>${a.bez?`${a.bez}. Bezirk, ${esc(BEZIRKE[a.bez])}`:"Wien"}</dd>
+    </dl>
+    <div class="contact">
+      <div class="org">${esc((o.name||"Fundservice der Stadt Wien").replace(/\s+/g," "))}</div>
+      ${o.tel?`<div>${o.telHref?`<a href="tel:${esc(o.telHref)}">${esc(o.tel)}</a>`:esc(o.tel)}</div>`:`<div><a href="tel:+43140008060">+43 1 4000-8060</a></div>`}
+      ${o.mail?`<div><a href="mailto:${esc(o.mail)}?subject=${encodeURIComponent("Fundtier "+a.id)}">${esc(o.mail)}</a></div>`:""}
+    </div>
+  </article>`;
+}
+function render(){
+  const info=state.view==="info";
+  document.querySelectorAll(".view").forEach(b=>b.setAttribute("aria-pressed",b.dataset.view===state.view));
+  $("#nFound").textContent=ANIMALS.length||"";
+  $("#filterArea").hidden=info;$("#listArea").hidden=info;$("#info").hidden=!info;
+  if(info)return;
+  renderKinds();
+  const list=applyFilters(ANIMALS);
+  if(state.sort==="new")list.sort((a,b)=>b.date-a.date||b.id-a.id);
+  if(state.sort==="old")list.sort((a,b)=>a.date-b.date||a.id-b.id);
+  if(state.sort==="bez")list.sort((a,b)=>a.bez-b.bez||b.date-a.date);
+  $("#count").innerHTML=`<b>${list.length}</b> von ${ANIMALS.length} Tieren`;
+  $("#grid").innerHTML=list.length?list.map(card).join(""):
+    `<div class="empty"><p><b>Kein Tier passt zu diesen Filtern.</b><br>Lockere einen Filter, zum Beispiel den Bezirk oder die Farbe. Tiere laufen oft weiter, als man denkt.</p><button type="button" class="reset" data-reset>Alle Filter zurücksetzen</button></div>`;
+}
+function fillSelects(){
+  const bezCount={};ANIMALS.forEach(a=>bezCount[a.bez]=(bezCount[a.bez]||0)+1);
+  $("#bez").innerHTML=`<option value="">Ganz Wien</option>`+Object.keys(bezCount).map(Number).filter(Boolean).sort((a,b)=>a-b)
+    .map(b=>`<option value="${b}">${b}. ${BEZIRKE[b]} (${bezCount[b]})</option>`).join("");
+  $("#col").innerHTML=`<option value="">Alle Farben</option>`+COLORS
+    .filter(c=>ANIMALS.some(a=>a.cids.includes(c.id)))
+    .map(c=>`<option value="${c.id}">${c.label}</option>`).join("");
+}
+function reset(){
+  Object.assign(state,{kind:"",q:"",bez:"",col:"",sex:"",age:""});
+  $("#q").value="";["#bez","#col","#sex","#age"].forEach(s=>$(s).value="");
+  render();
+}
+document.addEventListener("error",e=>{const t=e.target;if(t&&t.tagName==="IMG"){const f=t.closest(".photo");if(f)f.classList.add("fail");}},true);
+document.addEventListener("click",e=>{
+  const k=e.target.closest(".kind");if(k){state.kind=k.dataset.k;render();return;}
+  const v=e.target.closest("[data-view]");if(v){state.view=v.dataset.view;render();
+    const t=state.view==="info"?$("#info"):$(".filters");t.scrollIntoView({block:"start"});return;}
+  if(e.target.closest("[data-reset]"))reset();
+});
+$("#q").addEventListener("input",e=>{state.q=e.target.value;render();});
+[["#bez","bez"],["#col","col"],["#sex","sex"],["#age","age"],["#sort","sort"]].forEach(([s,k])=>$(s).addEventListener("change",e=>{state[k]=e.target.value;render();}));
+$("#reset").addEventListener("click",reset);
+$("#grid").innerHTML=`<div class="empty"><p>Gefundene Tiere werden geladen …</p></div>`;
+fetch("data.json",{cache:"no-cache"}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(d=>{
+  ANIMALS=(d.animals||[]).map(prep);
+  const up=new Date(d.updated);
+  $("#stand").textContent="Zuletzt aktualisiert: "+up.toLocaleString("de-AT",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"})+" Uhr.";
+  if(Date.now()-up.getTime()>24*3600e3){
+    const st=$("#stale");st.hidden=false;
+    st.textContent="Achtung: Die Daten sind seit über einem Tag nicht aktualisiert worden. Aktuelle Fundtiere findest du auf der Seite der Stadt Wien oder unter +43 1 4000-8060.";
+  }
+  fillSelects();render();
+}).catch(()=>{
+  $("#stand").textContent="";
+  $("#grid").innerHTML=`<div class="empty"><p><b>Die Fundtiere konnten nicht geladen werden.</b><br>Lade die Seite neu oder schau auf der <a href="https://www.wien.gv.at/zusammenleben/fundservice-tiere">Fundservice-Seite der Stadt Wien</a> nach. Telefon: <a href="tel:+43140008060">+43 1 4000-8060</a>.</p></div>`;
+});
+</script>
+</body>
+</html>
