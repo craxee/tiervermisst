@@ -2,7 +2,7 @@ name: Fundtiere aktualisieren
 
 on:
   schedule:
-    - cron: "17 */4 * * *"   # alle 4 Stunden (Server der Stadt schonen)
+    - cron: "17 * * * *"   # jede Stunde
   workflow_dispatch:          # Knopf "Run workflow" zum manuellen Starten
   push:
     branches: [main]          # nach eigenen Änderungen sofort neu veröffentlichen
@@ -46,6 +46,7 @@ jobs:
             echo "Keine Änderungen."
           else
             git commit -m "Fundtiere aktualisiert"
+            git pull --rebase origin main
             git push
           fi
 
