@@ -2,7 +2,7 @@ name: Fundtiere aktualisieren
 
 on:
   schedule:
-    - cron: "17 * * * *"   # jede Stunde
+    - cron: "17 7-19 * * *"   # stündlich, ca. 9–20 Uhr Wiener Zeit
   workflow_dispatch:          # Knopf "Run workflow" zum manuellen Starten
   push:
     branches: [main]          # nach eigenen Änderungen sofort neu veröffentlichen
