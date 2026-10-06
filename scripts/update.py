@@ -14,7 +14,10 @@ BASE = "https://www.wien.gv.at"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, "data.json")
 PHOTOS = os.path.join(ROOT, "photos")
-UA = {"User-Agent": "tiervermisst-updater/1.0 (gemeinnuetzige Fundtier-Suche)"}
+UA = {"User-Agent": "Mozilla/5.0 (compatible; tiervermisst-updater/1.1; gemeinnuetzige Fundtier-Suche)",
+      "Accept": "application/rss+xml, application/xml, image/*;q=0.9, */*;q=0.8"}
+PHOTO_BUDGET = 240   # hoechstens 4 Minuten fuer Fotos pro Lauf, der Rest kommt beim naechsten Lauf
+MAX_PHOTO_FAILS = 4  # nach so vielen Fehlern in Folge keine weiteren Fotos versuchen
 
 NS = {
     "dc": "http://purl.org/dc/elements/1.1/",
@@ -29,10 +32,18 @@ BIRDS = ("sittich", "vogel", "taube", "fink", "papagei", "huhn", "hahn", "ente",
 REPTILES = ("schildkr", "gecko", "schlange", "echse", "leguan", "agame", "python", "natter", "chamäleon", "chamaeleon", "frosch", "kröte")
 
 
-def fetch(url, timeout=30):
-    req = urllib.request.Request(url, headers=UA)
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return r.read(), r.headers.get("Content-Type", "")
+def fetch(url, timeout=15, tries=3):
+    last = None
+    for i in range(tries):
+        try:
+            req = urllib.request.Request(url, headers=UA)
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return r.read(), r.headers.get("Content-Type", "")
+        except Exception as e:
+            last = e
+            print(f"Versuch {i + 1} fuer {url} fehlgeschlagen: {e}", flush=True)
+            time.sleep(3)
+    raise last
 
 
 def text(el, path):
@@ -105,27 +116,37 @@ def parse(xml_bytes):
 def sync_photos(animals):
     os.makedirs(PHOTOS, exist_ok=True)
     keep = set()
+    start = time.time()
+    fails = 0
+    loaded = 0
     for a in animals:
         if not a["photoUrl"]:
             continue
         name = f"{a['id']}.jpg"
         path = os.path.join(PHOTOS, name)
         keep.add(name)
-        if not os.path.exists(path):
-            try:
-                body, ctype = fetch(a["photoUrl"])
-                if not ctype.startswith("image/") or len(body) < 500:
-                    raise ValueError("kein Bild")
-                with open(path, "wb") as f:
-                    f.write(body)
-                time.sleep(0.3)  # Server der Stadt schonen
-            except Exception as e:
-                print(f"Foto {a['id']} nicht geladen: {e}", file=sys.stderr)
-                continue
-        a["img"] = f"photos/{name}"
+        if os.path.exists(path):
+            a["img"] = f"photos/{name}"
+            continue
+        if fails >= MAX_PHOTO_FAILS or time.time() - start > PHOTO_BUDGET:
+            continue  # Seite zeigt das Foto dann direkt vom Server der Stadt
+        try:
+            body, ctype = fetch(a["photoUrl"], timeout=10, tries=1)
+            if not ctype.startswith("image/") or len(body) < 500:
+                raise ValueError("kein Bild")
+            with open(path, "wb") as f:
+                f.write(body)
+            a["img"] = f"photos/{name}"
+            loaded += 1
+            fails = 0
+            time.sleep(0.3)  # Server der Stadt schonen
+        except Exception as e:
+            fails += 1
+            print(f"Foto {a['id']} nicht geladen: {e}", flush=True)
     for old in os.listdir(PHOTOS):
         if old.endswith(".jpg") and old not in keep:
             os.remove(os.path.join(PHOTOS, old))
+    print(f"{loaded} neue Fotos geladen.", flush=True)
 
 
 def main():
@@ -136,7 +157,8 @@ def main():
                 old_count = len(json.load(f).get("animals", []))
         except Exception:
             pass
-    body, _ = fetch(FEED)
+    print("Hole Feed der Stadt Wien ...", flush=True)
+    body, _ = fetch(FEED, timeout=20, tries=3)
     animals = parse(body)
     if not animals:
         sys.exit("Feed leer oder unlesbar – alte Daten bleiben bestehen.")
