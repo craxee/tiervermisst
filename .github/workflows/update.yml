@@ -2,7 +2,7 @@ name: Fundtiere aktualisieren
 
 on:
   schedule:
-    - cron: "7,37 * * * *"   # alle 30 Minuten
+    - cron: "17 */4 * * *"   # alle 4 Stunden (Server der Stadt schonen)
   workflow_dispatch:          # Knopf "Run workflow" zum manuellen Starten
   push:
     branches: [main]          # nach eigenen Änderungen sofort neu veröffentlichen
@@ -19,7 +19,7 @@ concurrency:
 jobs:
   update-and-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
@@ -31,13 +31,16 @@ jobs:
           python-version: "3.12"
 
       - name: Fundtiere und Fotos von der Stadt Wien holen
+        id: update
         run: python scripts/update.py
-        continue-on-error: ${{ github.event_name == 'push' }}
+        timeout-minutes: 8
+        continue-on-error: true   # Seite wird trotzdem mit den letzten Daten veröffentlicht
 
       - name: Neue Daten speichern
         run: |
           git config user.name "fundtiere-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p photos
           git add data.json photos
           if git diff --cached --quiet; then
             echo "Keine Änderungen."
@@ -54,3 +57,9 @@ jobs:
 
       - id: deploy
         uses: actions/deploy-pages@v4
+
+      - name: Fehler beim Abholen melden
+        if: steps.update.outcome == 'failure' && github.event_name != 'push'
+        run: |
+          echo "::error::Die Daten der Stadt Wien konnten nicht abgeholt werden. Die Seite zeigt weiter die letzten Daten."
+          exit 1
