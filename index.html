@@ -480,10 +480,10 @@ function renderMap(){
   WIEN.b.forEach(d=>{
     const n=d.n,c=cnt[n]||0,name=BEZIRKE[n];
     const cls=["bz"];if(n===b)cls.push("sel");else if(near.includes(n))cls.push("near");
-    shapes+=`<g class="${cls.join(" ")}" data-bez="${n}" tabindex="0" role="button" aria-pressed="${n===b}" aria-label="${n}. Bezirk, ${esc(name)}: ${c} ${c===1?"Tier":"Tiere"}"><title>${n}. ${esc(name)}: ${c} ${c===1?"Tier":"Tiere"}</title><path d="${d.d}" style="fill:var(--q${bin(c)})"/></g>`;
+    shapes+=`<g class="${cls.join(" ")}" data-bez="${n}" tabindex="0" role="button" aria-pressed="${n===b}" aria-label="${n}. Bezirk, ${esc(name)}: ${c} ${c===1?"Tier":"Tiere"}"><title>${1000+n*10} ${esc(name)} (${n}. Bezirk): ${c} ${c===1?"Tier":"Tiere"}</title><path d="${d.d}" style="fill:var(--q${bin(c)})"/></g>`;
     const room=d.r*px;
-    const showNo=room>=26||(!c&&room>=12);
-    if(showNo)labels+=`<text class="no" x="${d.x}" y="${c?d.y-br-nf*.75:d.y}" font-size="${nf}">${n}.</text>`;
+    const showNo=room>=20;
+    if(showNo)labels+=`<text class="no" style="fill:var(--t${bin(c)})" x="${d.x}" y="${c?d.y-br-nf*.75:d.y}" font-size="${nf}">${1000+n*10}</text>`;
     if(c){const r=String(c).length>1?br*1.2:br;badges.push({c,r,ox:d.x,oy:showNo?d.y+nf*.2:d.y,x:d.x,y:showNo?d.y+nf*.2:d.y});}
   });
   // Abzeichen, die sich überlappen, auseinanderschieben
