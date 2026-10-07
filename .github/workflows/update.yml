@@ -2,7 +2,7 @@ name: Fundtiere aktualisieren
 
 on:
   schedule:
-    - cron: "17 7-19 * * *"   # stündlich, ca. 9–20 Uhr Wiener Zeit
+    - cron: "7,22,37,52 7-19 * * *"   # alle 15 Min. nachsehen, ca. 9–21 Uhr Wiener Zeit
   workflow_dispatch:          # Knopf "Run workflow" zum manuellen Starten
   push:
     branches: [main]          # nach eigenen Änderungen sofort neu veröffentlichen
@@ -28,17 +28,40 @@ jobs:
         with:
           ref: main
 
+      # Abruf nur, wenn der letzte länger als 50 Minuten her ist.
+      # Fällt ein Termin aus, holt der nächste (15 Min. später) ihn nach.
+      - name: Prüfen, ob ein Abruf fällig ist
+        id: due
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          python3 - >> "$GITHUB_OUTPUT" <<'PY'
+          import json, datetime
+          try:
+              u = datetime.datetime.fromisoformat(json.load(open("data.json"))["updated"])
+              age = (datetime.datetime.now(datetime.timezone.utc) - u).total_seconds() / 60
+          except Exception:
+              age = 9999
+          print("run=true" if age >= 50 else "run=false")
+          PY
+          cat "$GITHUB_OUTPUT"
+
       - uses: actions/setup-python@v5
+        if: steps.due.outputs.run == 'true'
         with:
           python-version: "3.12"
 
       - name: Fundtiere und Fotos von der Stadt Wien holen
+        if: steps.due.outputs.run == 'true'
         id: update
         run: python scripts/update.py
         timeout-minutes: 8
         continue-on-error: true   # Seite wird trotzdem mit den letzten Daten veröffentlicht
 
       - name: Neue Daten speichern
+        if: steps.due.outputs.run == 'true'
         run: |
           git config user.name "fundtiere-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -53,16 +76,19 @@ jobs:
           fi
 
       - uses: actions/configure-pages@v5
+        if: steps.due.outputs.run == 'true'
 
       - uses: actions/upload-pages-artifact@v3
+        if: steps.due.outputs.run == 'true'
         with:
           path: .
 
       - id: deploy
+        if: steps.due.outputs.run == 'true'
         uses: actions/deploy-pages@v4
 
       - name: Fehler beim Abholen melden
-        if: steps.update.outcome == 'failure' && github.event_name != 'push'
+        if: steps.due.outputs.run == 'true' && steps.update.outcome == 'failure' && github.event_name != 'push'
         run: |
           echo "::error::Die Daten der Stadt Wien konnten nicht abgeholt werden. Die Seite zeigt weiter die letzten Daten."
           exit 1
