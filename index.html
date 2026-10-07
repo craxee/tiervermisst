@@ -154,27 +154,42 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 #info{padding-bottom:40px}
 #info .btn{margin-top:4px}
 /* Bezirkskarte */
+:root{--q0:#E4E9E3;--q1:#F7E9BE;--q2:#EFD27F;--q3:#E2B13C;--q4:#B0841C;--mapline:#FFFFFF}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--q0:#1F2A27;--q1:#3B3320;--q2:#6B5622;--q3:#A8832C;--q4:#E3B547;--mapline:#121A18}}
+:root[data-theme="dark"]{--q0:#1F2A27;--q1:#3B3320;--q2:#6B5622;--q3:#A8832C;--q4:#E3B547;--mapline:#121A18}
 .mapbox{margin:18px 0 6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px 16px}
 .mapbox summary{cursor:pointer;font:700 1.1rem var(--display);list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px}
 .mapbox summary::-webkit-details-marker{display:none}
 .mapbox summary .hint2{font:400 .85rem var(--body);color:var(--muted);margin-left:auto}
 .mapbox summary::after{content:"▾";font-size:1rem;color:var(--muted);transition:transform .15s}
 .mapbox:not([open]) summary::after{transform:rotate(-90deg)}
-.vmap{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-rows:minmax(48px,auto);gap:5px;margin-top:12px;grid-template-areas:". . d19 d20 d21 d21 ." ". d17 d18 d09 d02 d22 d22" "d14 d16 d08 d01 d03 d22 d22" "d14 d15 d07 d06 d04 d11 ." "d13 d13 d12 d05 d10 d11 ." ". d23 d23 d23 d10 . ."}
-.bz{border:1.5px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);cursor:pointer;padding:5px 6px;text-align:left;display:flex;flex-direction:column;justify-content:space-between;min-width:0;font:inherit}
-.bz .no{font:800 1rem var(--display);line-height:1}
-.bz .nm{font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bz .ct{font:700 .8rem var(--body);align-self:flex-end;line-height:1}
-.bz .ct:empty{display:none}
-.bz.near{border:2px dashed var(--brass)}
-.bz.sel{background:var(--ink)!important;color:var(--bg);border-color:var(--ink)}
-.bz.sel .nm{color:inherit;opacity:.8}
-.maplegend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:.85rem;color:var(--muted);align-items:center}
-.maplegend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:5px;border:1px solid var(--line)}
-.maplegend .dash{border:2px dashed var(--brass);background:transparent}
+.mapwrap{position:relative;margin-top:10px;max-width:760px;margin-inline:auto}
+#wmap{display:block;width:100%;height:auto;overflow:visible}
+#wmap .bz{cursor:pointer;outline:none}
+#wmap .bz path{stroke:var(--mapline);stroke-width:2.5;stroke-linejoin:round;transition:fill .2s}
+#wmap .bz:hover path,#wmap .bz:focus-visible path{stroke:var(--ink);stroke-width:3}
+#wmap .bz.near path{stroke:var(--ink);stroke-width:2.5;stroke-dasharray:7 5}
+#wmap .bz.sel path{stroke:var(--ink);stroke-width:5}
+#wmap .lbl{pointer-events:none}
+#wmap .no{fill:var(--muted);font-family:var(--display);font-weight:700;text-anchor:middle;dominant-baseline:central}
+#wmap .badge circle{fill:var(--ink);stroke:var(--card)}
+#wmap .badge text{fill:var(--card);font-family:var(--display);font-weight:800;text-anchor:middle;dominant-baseline:central}
+.mapinfo{min-height:1.6em;margin:10px 0 0;font-size:.95rem;color:var(--muted);text-align:center}
+.mapinfo b{color:var(--ink);font-family:var(--display)}
+.maplegend{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 22px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:.85rem;color:var(--muted);align-items:center}
+.lg-scale{display:flex;align-items:center;gap:8px}
+.lg-steps{display:flex;gap:2px}
+.lg-steps span{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.75rem}
+.lg-steps i{display:block;width:34px;height:12px;border-radius:3px}
+.lg-steps span:first-child i{border-radius:6px 3px 3px 6px}.lg-steps span:last-child i{border-radius:3px 6px 6px 3px}
+.lg-item{display:flex;align-items:center;gap:7px}
+.lg-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 5px;border-radius:11px;background:var(--ink);color:var(--card);font:800 .78rem var(--display)}
+.lg-out{width:22px;height:16px;border-radius:4px;background:var(--q0);border:3px solid var(--ink)}
+.lg-near{width:22px;height:16px;border-radius:4px;background:var(--q0);border:2px dashed var(--ink)}
+.mapnote{margin:8px 0 0;text-align:center;font-size:.75rem;color:var(--muted)}
 .neargrid-title{grid-column:1/-1;margin:14px 0 0;font:800 1.25rem var(--display)}
 .neargrid-title span{display:block;font:400 .92rem var(--body);color:var(--muted);margin-top:2px}
-@media (max-width:600px){.bz .nm{display:none}.vmap{gap:4px}.bz{padding:4px}.mapbox summary .hint2{display:none}}
+@media (max-width:600px){.mapbox summary .hint2{display:none}.mapbox{padding:12px 10px 14px}}
 footer{border-top:1px solid var(--line);padding:22px 0 34px;color:var(--muted);font-size:.9rem}
 footer p{margin:0 0 6px;max-width:80ch}
 @media (prefers-reduced-motion:no-preference){.card{animation:in .25s ease-out both}@keyframes in{from{opacity:0;transform:translateY(4px)}}}
@@ -263,9 +278,16 @@ footer p{margin:0 0 6px;max-width:80ch}
 
   <div id="listArea">
   <details class="mapbox" id="mapbox" open>
-    <summary>Karte nach Bezirk <span class="hint2">Bezirk antippen zum Filtern</span></summary>
-    <div class="vmap" id="vmap" role="group" aria-label="Wiener Bezirke"></div>
-    <div class="maplegend"><span><i style="background:var(--brass)"></i>mehr Fundtiere</span><span><i class="dash"></i>Nachbarbezirk</span><span>Vereinfachte Darstellung, nicht maßstabsgetreu.</span></div>
+    <summary>Wo wurden Tiere gefunden? <span class="hint2">Bezirk antippen zum Filtern</span></summary>
+    <div class="mapwrap"><svg id="wmap" viewBox="0 0 1000 777" role="group" aria-label="Karte der Wiener Bezirke mit Anzahl gefundener Tiere"></svg></div>
+    <p class="mapinfo" id="mapinfo" aria-live="polite">Tippe auf einen Bezirk, um nur Tiere von dort zu sehen.</p>
+    <div class="maplegend">
+      <div class="lg-scale"><span>Fundtiere pro Bezirk</span><div class="lg-steps" id="lgsteps"></div></div>
+      <div class="lg-item"><span class="lg-badge">12</span>Anzahl Tiere</div>
+      <div class="lg-item"><span class="lg-out"></span>ausgewählt</div>
+      <div class="lg-item"><span class="lg-near"></span>Nachbarbezirk</div>
+    </div>
+    <p class="mapnote">Kartengrundlage: Statistik Austria, bearbeitet von Flooh Perlot, CC BY 4.0</p>
   </details>
   <div class="summary" aria-live="polite">
     <span id="count"></span>
@@ -429,16 +451,50 @@ function sortList(list){
   if(state.sort==="bez")list.sort((a,b)=>a.bez-b.bez||b.date-a.date);
   return list;
 }
+const WIEN={"w":1000,"h":777,"b":[{"n":1,"d":"M465.3,466.5L473.1,462.6L485.5,466.7L492.4,464.1L503.7,447.9L511.7,431.5L513.2,422.2L510.7,420.4L501.1,420.8L492.6,417.9L488.7,414.2L484.4,405.3L475.9,395.1L474.1,397.2L451.4,412.9L441.4,410.9L438.1,432.7L439.8,439.1L454.2,455.2L460.3,460.1Z","x":470,"y":433,"r":26},{"n":2,"d":"M513.2,422.2L522.0,415.6L532.0,417.2L536.4,420.5L541.2,430.6L545.7,450.3L551.7,455.7L564.1,459.3L569.9,463.7L576.2,476.0L584.9,486.2L607.2,505.7L614.9,510.4L721.9,557.6L764.9,583.4L792.1,597.7L800.3,589.5L749.5,542.6L678.1,471.6L612.6,403.2L575.0,361.6L546.7,327.4L518.0,350.1L521.0,359.7L508.6,368.0L504.1,359.4L494.5,353.1L481.0,359.7L476.6,366.0L469.1,370.1L471.4,389.1L484.4,405.3L488.7,414.2L492.6,417.9L501.1,420.8L510.7,420.4Z","x":610,"y":456,"r":38},{"n":3,"d":"M539.9,558.1L544.0,558.7L545.7,546.8L552.0,541.7L561.7,527.9L558.5,523.0L563.1,519.6L583.8,529.2L589.4,520.5L594.2,523.0L596.3,518.7L601.3,520.0L603.1,513.6L609.0,517.4L624.0,521.4L630.0,517.1L614.9,510.4L607.2,505.7L584.9,486.2L576.2,476.0L569.9,463.7L564.1,459.3L551.7,455.7L545.7,450.3L541.2,430.6L536.4,420.5L532.0,417.2L522.0,415.6L513.2,422.2L511.7,431.5L503.7,447.9L492.4,464.1L488.7,465.5L488.4,473.7L498.9,496.4L503.3,510.4L511.5,523.1L514.7,530.1L526.4,544.1Z","x":538,"y":491,"r":38},{"n":4,"d":"M472.6,526.6L484.5,521.7L485.0,518.5L503.3,510.4L498.9,496.4L488.4,473.7L488.7,465.5L485.5,466.7L473.1,462.6L465.3,466.5L455.1,474.8L448.7,477.8L454.6,488.3L460.4,495.0L455.8,502.7L462.3,510.9Z","x":479,"y":499,"r":19},{"n":5,"d":"M424.3,544.1L439.1,542.0L453.6,536.5L472.6,526.6L462.3,510.9L455.8,502.7L460.4,495.0L454.6,488.3L448.7,477.8L439.7,479.9L435.9,485.5L435.8,493.8L433.5,499.2L428.5,504.0L412.8,508.1L404.1,509.1Z","x":442,"y":519,"r":20},{"n":6,"d":"M404.1,509.1L412.8,508.1L428.5,504.0L433.5,499.2L435.8,493.8L435.9,485.5L439.7,479.9L448.7,477.8L455.1,474.8L465.3,466.5L460.3,460.1L454.2,455.2L450.0,460.1L434.0,466.7L418.4,475.1L397.8,480.9L397.7,487.1L392.9,500.0L397.3,509.7Z","x":415,"y":492,"r":15},{"n":7,"d":"M397.8,480.9L418.4,475.1L434.0,466.7L450.0,460.1L454.2,455.2L439.8,439.1L428.6,441.3L419.8,440.2L395.8,432.7L392.1,441.4L392.2,449.4L392.8,459.0Z","x":412,"y":457,"r":18},{"n":8,"d":"M395.8,432.7L419.8,440.2L428.6,441.3L439.8,439.1L438.1,432.7L441.4,410.9L439.7,409.4L415.1,407.0L401.9,407.7L397.8,419.2Z","x":423,"y":424,"r":16},{"n":9,"d":"M401.9,407.7L415.1,407.0L439.7,409.4L441.4,410.9L451.4,412.9L474.1,397.2L475.9,395.1L471.4,389.1L469.1,370.1L458.6,355.5L454.5,344.3L453.1,336.1L454.4,327.6L442.0,328.3L440.0,338.7L434.5,343.9L428.1,348.3L425.9,352.5L422.6,374.3L421.3,377.2L408.7,383.1L404.7,399.9Z","x":446,"y":385,"r":24},{"n":10,"d":"M645.0,769.1L638.6,753.0L637.1,726.9L634.3,724.8L635.1,701.0L643.0,700.6L627.1,665.1L569.5,590.2L544.2,563.7L514.7,530.1L511.5,523.1L503.3,510.4L485.0,518.5L484.5,521.7L472.6,526.6L453.6,536.5L439.1,542.0L424.3,544.1L417.9,546.3L403.7,554.8L410.8,563.0L415.0,563.2L418.8,572.0L413.8,572.6L412.6,579.5L393.0,575.2L379.2,604.4L385.4,612.1L394.8,635.3L402.6,642.8L422.9,647.8L449.3,649.0L493.5,664.4L486.1,685.0L480.4,686.2L477.5,698.5L466.8,725.3L464.5,735.9L465.1,736.9L479.5,741.1L491.5,742.0L512.2,745.3L521.9,748.4L528.7,751.7L564.3,761.3L563.6,765.2L569.8,768.7L572.3,776.7L583.8,775.5L581.0,767.4L603.2,766.4L609.3,757.2L621.3,762.7Z","x":559,"y":690,"r":67},{"n":11,"d":"M643.0,700.6L686.3,697.1L693.8,693.0L705.6,682.3L707.9,681.9L718.4,668.1L745.6,640.1L749.8,630.1L753.8,630.1L774.2,635.3L787.6,621.5L800.2,631.4L839.0,621.1L796.8,593.2L792.1,597.7L764.9,583.4L721.9,557.6L648.3,525.0L630.0,517.1L624.0,521.4L609.0,517.4L603.1,513.6L601.3,520.0L596.3,518.7L594.2,523.0L589.4,520.5L583.8,529.2L563.1,519.6L558.5,523.0L561.7,527.9L552.0,541.7L545.7,546.8L544.0,558.7L539.9,558.1L544.2,563.7L569.5,590.2L627.1,665.1Z","x":675,"y":612,"r":69},{"n":12,"d":"M388.7,619.8L385.4,612.1L379.2,604.4L393.0,575.2L412.6,579.5L413.8,572.6L418.8,572.0L415.0,563.2L410.8,563.0L403.7,554.8L417.9,546.3L424.3,544.1L404.1,509.1L397.3,509.7L383.8,524.7L379.1,526.6L368.5,526.9L349.5,519.1L346.7,532.4L333.6,560.1L318.9,577.3L303.9,572.1L301.4,569.0L295.1,577.8L289.5,577.1L277.9,608.3L288.5,610.1L284.0,617.1L280.4,626.1L292.2,630.9L309.0,615.5L327.2,621.5L346.0,625.2L346.9,629.7L353.8,627.2L367.1,630.1L375.9,634.5Z","x":351,"y":591,"r":31},{"n":13,"d":"M277.9,608.3L289.5,577.1L295.1,577.8L301.4,569.0L303.9,572.1L318.9,577.3L333.6,560.1L346.7,532.4L349.5,519.1L334.5,513.9L311.3,512.2L273.5,500.9L251.2,496.2L222.3,492.2L210.9,488.4L176.2,463.2L169.8,460.4L150.7,458.1L141.4,454.0L135.9,449.8L133.0,454.8L127.3,453.7L111.3,458.3L84.7,443.3L79.8,438.5L71.3,447.5L69.2,447.2L64.4,456.4L59.1,473.9L55.8,479.0L55.7,488.5L53.5,499.6L45.3,517.8L35.4,526.7L28.7,538.8L20.8,545.4L14.9,552.2L14.3,564.4L0.0,575.2L6.8,583.1L29.9,592.9L36.1,602.1L39.3,613.6L37.4,630.1L41.3,639.3L54.5,634.1L108.3,643.6L121.8,657.0L127.3,651.9L163.8,630.7L178.3,626.0L188.4,617.0L194.5,615.8L205.0,617.3L230.4,632.7L245.9,606.8L250.5,611.5L246.3,618.4L251.1,621.7L260.8,619.8L266.1,629.3L276.3,624.1Z","x":131,"y":548,"r":89},{"n":14,"d":"M64.4,456.4L69.2,447.2L71.3,447.5L79.8,438.5L84.7,443.3L111.3,458.3L127.3,453.7L133.0,454.8L135.9,449.8L141.4,454.0L150.7,458.1L169.8,460.4L176.2,463.2L210.9,488.4L222.3,492.2L251.2,496.2L273.5,500.9L311.3,512.2L334.5,513.9L337.6,502.5L350.0,503.2L342.8,496.9L341.3,490.2L330.9,486.5L333.8,478.6L334.9,468.9L345.7,468.7L321.3,451.2L310.1,447.2L295.7,444.9L283.7,437.9L267.8,440.9L262.9,436.5L263.0,418.3L261.4,412.2L250.5,408.7L236.6,408.3L230.6,406.4L223.7,399.2L206.6,397.6L197.2,391.1L190.2,390.2L181.3,383.9L180.6,377.2L184.0,369.5L186.9,354.9L189.6,351.0L198.1,345.9L207.3,335.8L216.2,328.3L212.9,323.5L195.4,314.4L172.4,312.4L161.6,317.6L150.8,319.9L141.2,310.6L140.1,303.0L149.5,281.8L137.4,275.7L131.3,274.6L121.5,264.1L105.5,251.9L99.7,244.5L84.5,237.9L70.9,223.5L66.2,222.1L61.0,226.0L58.0,246.8L60.2,250.6L52.9,257.8L47.0,261.0L40.3,272.0L36.4,275.9L36.3,284.5L29.4,301.1L31.8,311.7L30.8,322.5L28.0,333.5L29.6,338.6L40.8,346.2L43.1,352.1L31.8,356.7L28.6,362.4L22.2,368.1L11.4,372.1L8.3,377.3L20.4,377.7L26.7,376.1L35.9,376.8L41.3,382.6L33.2,391.1L35.9,401.4L40.4,411.5L50.3,418.1L58.6,419.4L67.1,423.6L70.1,428.8L64.8,432.9L59.4,440.9L53.6,442.8L51.5,449.8L60.7,456.1Z","x":111,"y":375,"r":65},{"n":15,"d":"M349.5,519.1L368.5,526.9L379.1,526.6L383.8,524.7L397.3,509.7L392.9,500.0L397.7,487.1L397.8,480.9L392.8,459.0L392.2,449.4L383.4,449.9L330.7,437.9L329.9,444.5L325.6,454.4L345.7,468.7L334.9,468.9L333.8,478.6L330.9,486.5L341.3,490.2L342.8,496.9L350.0,503.2L337.6,502.5L334.5,513.9Z","x":369,"y":482,"r":27},{"n":16,"d":"M181.3,383.9L190.2,390.2L197.2,391.1L206.6,397.6L223.7,399.2L230.6,406.4L236.6,408.3L250.5,408.7L261.4,412.2L263.0,418.3L262.9,436.5L267.8,440.9L283.7,437.9L295.7,444.9L310.1,447.2L321.3,451.2L325.6,454.4L329.9,444.5L330.7,437.9L383.4,449.9L392.2,449.4L392.1,441.4L395.8,432.7L397.8,419.2L396.1,408.1L379.4,411.2L363.3,415.4L362.6,407.3L354.8,407.4L348.8,399.2L351.4,387.4L330.8,376.5L329.2,379.4L315.7,379.7L314.2,372.6L309.0,371.5L301.9,376.5L291.6,371.8L276.1,376.6L268.1,383.2L264.9,379.2L265.2,373.2L259.5,375.2L248.8,366.8L238.4,362.7L214.0,364.6L199.8,371.7L193.0,370.9L188.9,377.1Z","x":306,"y":411,"r":33},{"n":17,"d":"M401.9,407.7L404.7,399.9L396.8,398.2L398.8,390.7L390.3,388.1L391.4,378.6L379.7,370.0L370.8,364.9L368.2,360.0L363.1,364.7L356.5,364.2L356.8,358.3L353.9,354.4L339.6,351.6L340.6,345.9L338.0,341.8L328.1,343.2L304.4,331.7L296.3,322.1L290.6,321.8L283.7,326.3L283.9,315.0L269.9,315.8L261.1,313.4L258.6,309.1L271.8,304.3L276.0,296.4L281.6,291.5L260.4,292.4L254.5,290.9L254.0,284.6L269.3,271.9L263.4,261.5L261.1,251.6L262.1,244.0L248.2,250.0L236.7,249.0L228.4,252.1L221.0,260.4L223.6,268.5L209.4,278.3L211.0,282.1L206.7,287.7L200.0,292.7L194.2,290.5L192.8,298.5L189.3,302.5L188.9,314.0L195.4,314.4L212.9,323.5L216.2,328.3L207.3,335.8L198.1,345.9L189.6,351.0L186.9,354.9L184.0,369.5L180.6,377.2L181.3,383.9L188.9,377.1L193.0,370.9L199.8,371.7L214.0,364.6L238.4,362.7L248.8,366.8L259.5,375.2L265.2,373.2L264.9,379.2L268.1,383.2L276.1,376.6L291.6,371.8L301.9,376.5L309.0,371.5L314.2,372.6L315.7,379.7L329.2,379.4L330.8,376.5L351.4,387.4L348.8,399.2L354.8,407.4L362.6,407.3L363.3,415.4L379.4,411.2L396.1,408.1L397.8,419.2Z","x":242,"y":336,"r":27},{"n":18,"d":"M404.7,399.9L408.7,383.1L421.3,377.2L422.6,374.3L425.9,352.5L428.1,348.3L434.5,343.9L426.0,344.1L427.1,337.5L418.3,339.7L405.3,336.9L394.1,336.9L394.1,324.6L374.6,324.4L357.2,315.5L350.6,313.8L348.6,309.3L340.5,307.5L328.1,301.5L317.4,292.6L318.1,287.3L304.6,280.7L290.3,278.9L269.3,271.9L254.0,284.6L254.5,290.9L260.4,292.4L281.6,291.5L276.0,296.4L271.8,304.3L258.6,309.1L261.1,313.4L269.9,315.8L283.9,315.0L283.7,326.3L290.6,321.8L296.3,322.1L304.4,331.7L328.1,343.2L338.0,341.8L340.6,345.9L339.6,351.6L353.9,354.4L356.8,358.3L356.5,364.2L363.1,364.7L368.2,360.0L370.8,364.9L379.7,370.0L391.4,378.6L390.3,388.1L398.8,390.7L396.8,398.2Z","x":403,"y":358,"r":21},{"n":19,"d":"M269.3,271.9L290.3,278.9L304.6,280.7L318.1,287.3L317.4,292.6L328.1,301.5L340.5,307.5L348.6,309.3L350.6,313.8L357.2,315.5L374.6,324.4L394.1,324.6L394.1,336.9L405.3,336.9L418.3,339.7L427.1,337.5L426.0,344.1L434.5,343.9L440.0,338.7L442.0,328.3L454.4,327.6L459.0,314.2L466.3,299.3L476.7,282.4L479.6,275.1L479.2,264.5L473.1,248.5L473.3,242.4L471.1,232.6L481.6,227.4L440.0,149.1L433.8,147.8L420.2,122.1L402.7,127.8L407.7,132.9L411.0,142.4L391.3,154.9L378.8,159.8L375.2,169.3L371.8,172.4L362.0,171.5L351.0,168.6L344.3,172.4L335.4,184.6L327.9,184.9L319.7,190.5L310.0,193.0L299.4,187.2L291.7,192.2L284.6,191.5L270.8,197.8L267.5,205.3L263.2,208.8L265.2,213.4L276.6,212.3L283.6,220.5L278.6,229.2L272.0,231.1L263.9,238.9L262.1,244.0L261.1,251.6L263.4,261.5Z","x":393,"y":244,"r":75},{"n":20,"d":"M469.1,370.1L476.6,366.0L481.0,359.7L494.5,353.1L504.1,359.4L508.6,368.0L521.0,359.7L518.0,350.1L546.7,327.4L513.5,281.0L497.6,255.9L481.6,227.4L471.1,232.6L473.3,242.4L473.1,248.5L479.2,264.5L479.6,275.1L476.7,282.4L466.3,299.3L459.0,314.2L454.4,327.6L453.1,336.1L454.5,344.3L458.6,355.5Z","x":498,"y":317,"r":34},{"n":21,"d":"M546.7,327.4L560.0,316.8L558.3,309.3L566.2,308.5L575.3,305.0L580.5,300.2L584.8,293.4L596.5,291.5L613.1,291.2L621.9,288.1L622.6,268.4L628.2,270.9L631.1,262.3L641.1,241.1L648.6,239.5L644.8,231.5L653.5,230.1L669.5,231.2L678.2,240.8L685.1,226.4L721.5,193.5L730.5,186.9L736.2,180.8L740.3,179.6L721.6,166.3L704.7,152.5L653.5,116.6L653.1,71.7L651.4,61.3L647.7,50.3L647.1,40.7L648.2,31.0L646.8,22.2L622.2,8.6L614.1,3.2L601.7,0.0L593.9,0.5L583.9,3.7L562.1,12.6L558.7,22.4L543.8,16.7L536.5,12.9L539.5,9.0L539.2,0.3L528.7,1.1L529.4,6.6L524.5,13.7L513.9,12.1L505.1,21.0L501.9,28.8L502.3,37.1L507.0,46.3L510.5,58.7L508.6,65.8L513.1,71.1L510.7,75.6L511.9,81.0L500.4,78.3L495.1,91.5L489.6,101.4L496.9,113.1L498.2,124.5L495.4,130.3L477.2,132.2L469.7,134.6L467.4,139.6L470.1,149.6L473.6,154.0L467.7,157.9L458.3,153.1L440.0,149.1L497.6,255.9L527.0,300.8Z","x":575,"y":172,"r":90},{"n":22,"d":"M998.8,676.1L1000.0,650.0L996.2,642.6L989.5,635.4L993.0,630.9L997.3,621.2L994.2,610.1L988.9,604.9L983.9,602.9L976.5,603.3L965.2,609.5L960.0,615.7L950.5,601.5L941.3,601.3L943.9,609.4L938.3,609.2L930.0,599.4L931.2,594.1L926.4,590.2L924.0,579.2L924.5,574.1L932.2,572.6L933.0,567.5L929.2,552.3L919.9,549.2L915.6,553.2L909.5,552.8L908.2,557.1L914.9,560.0L917.3,568.3L907.7,566.0L902.7,568.4L896.9,566.0L896.2,561.6L903.1,561.1L895.9,552.3L899.5,531.6L908.3,538.1L908.3,531.1L900.2,528.3L901.9,515.9L904.5,507.7L909.8,497.8L900.4,471.8L895.9,463.6L900.4,447.4L916.0,417.4L920.5,403.8L922.0,394.3L922.8,376.6L930.4,341.3L937.5,317.4L925.2,312.5L926.1,303.3L903.8,302.8L908.2,284.1L912.1,258.6L923.0,226.3L901.8,221.6L887.7,226.7L886.7,229.7L866.2,224.3L856.8,220.3L852.7,211.2L836.7,208.0L839.9,195.9L827.7,188.0L821.1,186.1L826.6,171.9L833.4,159.2L836.6,157.0L841.9,140.8L837.6,134.6L823.8,129.7L809.7,122.5L794.5,116.7L792.1,113.8L757.1,111.9L756.0,121.6L760.3,155.2L762.4,162.1L758.0,176.4L756.8,186.7L748.9,184.6L740.3,179.6L736.2,180.8L730.5,186.9L721.5,193.5L685.1,226.4L678.2,240.8L669.5,231.2L653.5,230.1L644.8,231.5L648.6,239.5L641.1,241.1L631.1,262.3L628.2,270.9L622.6,268.4L621.9,288.1L613.1,291.2L596.5,291.5L584.8,293.4L580.5,300.2L575.3,305.0L566.2,308.5L558.3,309.3L560.0,316.8L546.7,327.4L575.0,361.6L644.8,437.4L749.5,542.6L800.3,589.5L796.8,593.2L839.0,621.1L846.1,622.9L867.8,637.1L905.8,675.3L913.7,680.7L926.4,685.6L953.9,694.2L996.4,711.1L997.5,704.2Z","x":773,"y":367,"r":141},{"n":23,"d":"M91.5,738.2L85.1,745.3L88.2,751.1L93.6,754.5L99.4,750.9L110.3,748.0L136.9,730.8L158.1,726.3L172.6,727.0L181.2,731.5L190.4,732.3L201.9,727.7L207.8,721.7L215.6,717.3L225.6,716.2L232.8,717.5L242.5,722.1L249.9,723.4L257.8,730.3L267.8,727.7L293.1,732.8L294.9,748.6L300.7,751.7L310.7,762.1L323.0,770.2L329.4,770.6L333.8,747.6L344.8,750.3L346.7,746.9L356.0,720.5L361.8,706.9L360.8,701.3L414.8,718.2L427.2,721.0L445.6,733.2L464.5,735.9L466.8,725.3L477.5,698.5L480.4,686.2L486.1,685.0L493.5,664.4L449.3,649.0L422.9,647.8L402.6,642.8L394.8,635.3L388.7,619.8L375.9,634.5L367.1,630.1L353.8,627.2L346.9,629.7L346.0,625.2L327.2,621.5L309.0,615.5L292.2,630.9L280.4,626.1L284.0,617.1L288.5,610.1L277.9,608.3L276.3,624.1L266.1,629.3L260.8,619.8L251.1,621.7L246.3,618.4L250.5,611.5L245.9,606.8L230.4,632.7L205.0,617.3L194.5,615.8L188.4,617.0L178.3,626.0L163.8,630.7L127.3,651.9L121.8,657.0L108.3,643.6L104.4,642.9L103.0,646.0L95.0,642.3L93.7,647.2L88.5,650.3L77.9,652.2L72.2,657.7L70.7,664.0L77.5,670.7L86.2,685.0L87.2,689.2L93.1,690.9L102.8,710.0L108.5,708.3L128.9,705.0L142.9,703.7L138.5,713.9L143.6,715.8L143.4,723.1L127.0,727.0L111.2,733.2Z","x":314,"y":681,"r":51}]};
+const BINS=[[0,0,"0"],[1,2,"1–2"],[3,5,"3–5"],[6,10,"6–10"],[11,1e9,"11+"]];
+function bin(c){return BINS.findIndex(b=>c>=b[0]&&c<=b[1])}
+let mapHover=0;
 function renderMap(){
+  const svg=$("#wmap");if(!svg)return;
   const cnt={};applyFilters(ANIMALS,"bez").forEach(a=>{if(a.bez)cnt[a.bez]=(cnt[a.bez]||0)+1});
-  const max=Math.max(1,...Object.values(cnt));
   const b=+state.bez,near=b?(NEIGH[b]||[]):[];
-  $("#vmap").innerHTML=BEZIRKE.slice(1).map((name,i)=>{
-    const n=i+1,c=cnt[n]||0,pct=c?Math.round(18+62*c/max):0;
+  const px=Math.max(.2,(svg.clientWidth||700)/WIEN.w); // Bildschirm-Pixel pro Karteneinheit
+  const small=(svg.clientWidth||700)<520;const br=(small?9.5:11)/px, bf=(small?11:12.5)/px, nf=(small?11:12)/px;
+  let shapes="",labels="",lines="";
+  const badges=[];
+  WIEN.b.forEach(d=>{
+    const n=d.n,c=cnt[n]||0,name=BEZIRKE[n];
     const cls=["bz"];if(n===b)cls.push("sel");else if(near.includes(n))cls.push("near");
-    const style=`grid-area:d${String(n).padStart(2,"0")};`+(c?`background:color-mix(in srgb,var(--brass) ${pct}%,var(--bg));`:"");
-    return `<button type="button" class="${cls.join(" ")}" data-bez="${n}" style="${style}" aria-pressed="${n===b}" aria-label="${n}. Bezirk, ${esc(name)}: ${c} Tiere"><span class="no">${n}</span><span class="nm">${esc(name)}</span><span class="ct">${c||""}</span></button>`;
-  }).join("");
+    shapes+=`<g class="${cls.join(" ")}" data-bez="${n}" tabindex="0" role="button" aria-pressed="${n===b}" aria-label="${n}. Bezirk, ${esc(name)}: ${c} ${c===1?"Tier":"Tiere"}"><title>${n}. ${esc(name)}: ${c} ${c===1?"Tier":"Tiere"}</title><path d="${d.d}" style="fill:var(--q${bin(c)})"/></g>`;
+    const room=d.r*px;
+    const showNo=room>=26||(!c&&room>=12);
+    if(showNo)labels+=`<text class="no" x="${d.x}" y="${c?d.y-br-nf*.75:d.y}" font-size="${nf}">${n}.</text>`;
+    if(c){const r=String(c).length>1?br*1.2:br;badges.push({c,r,ox:d.x,oy:showNo?d.y+nf*.2:d.y,x:d.x,y:showNo?d.y+nf*.2:d.y});}
+  });
+  // Abzeichen, die sich überlappen, auseinanderschieben
+  const gap=2/px;
+  for(let it=0;it<120;it++){let moved=false;
+    for(let i=0;i<badges.length;i++)for(let j=i+1;j<badges.length;j++){
+      const A=badges[i],B=badges[j];let dx=B.x-A.x,dy=B.y-A.y,dist=Math.hypot(dx,dy)||.01;const need=A.r+B.r+gap;
+      if(dist<need){const push=(need-dist)/2;dx/=dist;dy/=dist;A.x-=dx*push;A.y-=dy*push;B.x+=dx*push;B.y+=dy*push;moved=true;}}
+    badges.forEach(o=>{o.x+=(o.ox-o.x)*.04;o.y+=(o.oy-o.y)*.04;});
+    if(!moved&&it>5)break;}
+  badges.forEach(o=>{
+    if(Math.hypot(o.x-o.ox,o.y-o.oy)>o.r*.9)lines+=`<line x1="${o.ox}" y1="${o.oy}" x2="${o.x}" y2="${o.y}" stroke="var(--ink)" stroke-width="${1.2/px}"/><circle cx="${o.ox}" cy="${o.oy}" r="${2/px}" fill="var(--ink)"/>`;
+    labels+=`<g class="badge" transform="translate(${o.x.toFixed(1)} ${o.y.toFixed(1)})"><circle r="${o.r}" stroke-width="${1.5/px}"/><text font-size="${bf}">${o.c}</text></g>`;
+  });
+  labels=lines+labels;
+  svg.innerHTML=shapes+`<g class="lbl">${labels}</g>`;
+  const show=mapHover||b;
+  const info=$("#mapinfo");
+  if(show){const c=cnt[show]||0;
+    info.innerHTML=`<b>${show}. ${esc(BEZIRKE[show])}</b> · ${c} ${c===1?"Fundtier":"Fundtiere"}`+(show===b?" · nochmal antippen zum Aufheben":(mapHover?" · antippen zum Filtern":""));
+  }else info.textContent="Tippe auf einen Bezirk, um nur Tiere von dort zu sehen.";
+}
+function renderLegend(){
+  const el=$("#lgsteps");if(!el)return;
+  el.innerHTML=BINS.map((b,i)=>`<span><i style="background:var(--q${i})"></i>${b[2]}</span>`).join("");
 }
 function fillSelects(){
   const bezCount={};ANIMALS.forEach(a=>bezCount[a.bez]=(bezCount[a.bez]||0)+1);
@@ -453,10 +509,20 @@ function reset(){
   $("#q").value="";["#bez","#col","#sex","#age"].forEach(s=>$(s).value="");
   render();
 }
+document.addEventListener("mouseover",e=>{if(matchMedia("(hover: none)").matches)return;const g=e.target.closest&&e.target.closest("#wmap .bz");const n=g?+g.dataset.bez:0;if(n!==mapHover){mapHover=n;updateInfo();}});
+document.addEventListener("focusin",e=>{const g=e.target.closest&&e.target.closest("#wmap .bz");if(g){mapHover=+g.dataset.bez;updateInfo();}});
+document.addEventListener("keydown",e=>{const g=e.target.closest&&e.target.closest("#wmap .bz");if(g&&(e.key==="Enter"||e.key===" ")){e.preventDefault();g.dispatchEvent(new MouseEvent("click",{bubbles:true}));}});
+function updateInfo(){const info=$("#mapinfo");if(!info)return;const b=+state.bez,show=mapHover||b;
+  if(!show){info.textContent="Tippe auf einen Bezirk, um nur Tiere von dort zu sehen.";return;}
+  const c=applyFilters(ANIMALS,"bez").filter(a=>a.bez===show).length;
+  info.innerHTML=`<b>${show}. ${esc(BEZIRKE[show])}</b> · ${c} ${c===1?"Fundtier":"Fundtiere"}`+(show===b?" · nochmal antippen zum Aufheben":" · antippen zum Filtern");}
+let rzT;addEventListener("resize",()=>{clearTimeout(rzT);rzT=setTimeout(()=>{if(state.view!=="info")renderMap()},150)});
+document.addEventListener("toggle",e=>{if(e.target.id==="mapbox"&&e.target.open)renderMap()},true);
+renderLegend();
 document.addEventListener("error",e=>{const t=e.target;if(t&&t.tagName==="IMG"){const f=t.closest(".photo");if(f)f.classList.add("fail");}},true);
 document.addEventListener("click",e=>{
   const k=e.target.closest(".kind");if(k){state.kind=k.dataset.k;render();return;}
-  const bz=e.target.closest(".bz");if(bz){const n=bz.dataset.bez;state.bez=state.bez===n?"":n;$("#bez").value=state.bez;render();
+  const bz=e.target.closest(".bz");if(bz){const n=bz.dataset.bez;mapHover=0;state.bez=state.bez===n?"":n;$("#bez").value=state.bez;render();
     if(state.bez)$(".summary").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});return;}
   const v=e.target.closest("[data-view]");if(v){state.view=v.dataset.view;render();
     const t=state.view==="info"?$("#info"):$(".filters");t.scrollIntoView({block:"start"});return;}
