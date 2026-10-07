@@ -167,17 +167,24 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 .mapbox summary .hint2{font:400 .85rem var(--body);color:var(--muted);margin-left:auto}
 .mapbox summary::after{content:"▾";font-size:1rem;color:var(--muted);transition:transform .15s}
 .mapbox:not([open]) summary::after{transform:rotate(-90deg)}
-.mapwrap{position:relative;margin-top:10px;max-width:760px;margin-inline:auto}
+.mapgrid{display:flex;gap:18px;align-items:center;justify-content:center;margin-top:10px}
+.mapwrap{position:relative;flex:1 1 auto;max-width:760px;min-width:0}
 #wmap{display:block;width:100%;height:auto;overflow:visible}
-#wmap .bz{cursor:pointer;outline:none}
-#wmap .bz path{stroke:var(--mapline);stroke-width:2.5;stroke-linejoin:round;transition:fill .2s}
-#wmap .bz:hover path,#wmap .bz:focus-visible path{stroke:var(--ink);stroke-width:3}
-#wmap .bz.near path{stroke:var(--ink);stroke-width:2.5;stroke-dasharray:7 5}
-#wmap .bz.sel path{stroke:var(--ink);stroke-width:5}
-#wmap .lbl{pointer-events:none}
-#wmap .no{fill:var(--muted);font-family:var(--display);font-weight:700;text-anchor:middle;dominant-baseline:central}
-#wmap .badge circle{fill:var(--ink);stroke:var(--card)}
-#wmap .badge text{fill:var(--card);font-family:var(--display);font-weight:800;text-anchor:middle;dominant-baseline:central}
+.inset{flex:0 0 230px}
+.inset-t{margin:0 0 6px;font:700 .85rem var(--display);color:var(--muted);text-align:center}
+#wins{display:block;width:100%;height:auto;overflow:hidden;border:1.5px solid var(--line);border-radius:12px;background:var(--card)}
+#wins .bz path{vector-effect:non-scaling-stroke}
+#wmap .insetbox{fill:none;stroke:var(--ink);stroke-dasharray:4 4;opacity:.55;pointer-events:none}
+@media (max-width:900px){.mapgrid{flex-direction:column}.mapwrap{width:100%}.inset{flex:none;width:min(100%,300px)}}
+#wmap .bz,#wins .bz{cursor:pointer;outline:none}
+#wmap .bz path,#wins .bz path{stroke:var(--mapline);stroke-width:2.5;stroke-linejoin:round;transition:fill .2s}
+#wmap .bz:hover path,#wmap .bz:focus-visible path,#wins .bz:hover path,#wins .bz:focus-visible path{stroke:var(--ink);stroke-width:3}
+#wmap .bz.near path,#wins .bz.near path{stroke:var(--ink);stroke-width:2.5;stroke-dasharray:7 5}
+#wmap .bz.sel path,#wins .bz.sel path{stroke:var(--ink);stroke-width:5}
+#wmap .lbl,#wins .lbl{pointer-events:none}
+#wmap .no,#wins .no{fill:var(--muted);font-family:var(--display);font-weight:700;text-anchor:middle;dominant-baseline:central}
+#wmap .badge circle,#wins .badge circle{fill:var(--ink);stroke:var(--card)}
+#wmap .badge text,#wins .badge text{fill:var(--card);font-family:var(--display);font-weight:800;text-anchor:middle;dominant-baseline:central}
 .mapinfo{min-height:1.6em;margin:10px 0 0;font-size:.95rem;color:var(--muted);text-align:center}
 .mapinfo b{color:var(--ink);font-family:var(--display)}
 .maplegend{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 22px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:.85rem;color:var(--muted);align-items:center}
@@ -205,7 +212,7 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 .vmap .bz.sel{border:3px solid var(--ink);box-shadow:0 3px 10px rgba(0,0,0,.28)}
 .mapnote-m{display:none}
 @media (max-width:600px){.mapbox summary .hint2{display:none}.mapbox{padding:12px 8px 14px}
-.mapwrap,.mapnote{display:none}.vmap{display:grid}.mapnote-m{display:block}}
+.mapgrid,.mapnote{display:none}.vmap{display:grid}.mapnote-m{display:block}}
 footer{border-top:1px solid var(--line);padding:22px 0 34px;color:var(--muted);font-size:.9rem}
 footer p{margin:0 0 6px;max-width:80ch}
 @media (prefers-reduced-motion:no-preference){.card{animation:in .25s ease-out both}@keyframes in{from{opacity:0;transform:translateY(4px)}}}
@@ -296,7 +303,8 @@ footer p{margin:0 0 6px;max-width:80ch}
   <details class="mapbox" id="mapbox" open>
     <summary>Wo wurden Tiere gefunden? <span class="hint2">Bezirk antippen zum Filtern</span></summary>
     <div class="vmap" id="vmap" role="group" aria-label="Wiener Bezirke (vereinfacht)"></div>
-    <div class="mapwrap"><svg id="wmap" viewBox="0 0 1000 777" role="group" aria-label="Karte der Wiener Bezirke mit Anzahl gefundener Tiere"></svg></div>
+    <div class="mapgrid"><div class="mapwrap"><svg id="wmap" viewBox="0 0 1000 777" role="group" aria-label="Karte der Wiener Bezirke mit Anzahl gefundener Tiere"></svg></div>
+    <div class="inset"><p class="inset-t">Innere Bezirke vergrößert</p><svg id="wins" viewBox="378 325 150 225" role="group" aria-label="Vergrößerte Karte der inneren Bezirke"></svg></div></div>
     <p class="mapinfo" id="mapinfo" aria-live="polite">Tippe auf einen Bezirk, um nur Tiere von dort zu sehen.</p>
     <div class="maplegend">
       <div class="lg-scale"><span>Fundtiere pro Bezirk</span><div class="lg-steps" id="lgsteps"></div></div>
@@ -473,18 +481,17 @@ const WIEN={"w":1000,"h":777,"b":[{"n":1,"d":"M465.3,466.5L473.1,462.6L485.5,466
 const BINS=[[0,0,"0"],[1,2,"1–2"],[3,5,"3–5"],[6,10,"6–10"],[11,1e9,"11+"]];
 function bin(c){return BINS.findIndex(b=>c>=b[0]&&c<=b[1])}
 let mapHover=0;
-function renderMap(){
-  const svg=$("#wmap");if(!svg)return;
-  const cnt={};applyFilters(ANIMALS,"bez").forEach(a=>{if(a.bez)cnt[a.bez]=(cnt[a.bez]||0)+1});
-  const b=+state.bez,near=b?(NEIGH[b]||[]):[];
-  const px=Math.max(.2,(svg.clientWidth||700)/WIEN.w); // Bildschirm-Pixel pro Karteneinheit
-  const small=(svg.clientWidth||700)<520;const br=(small?9.5:11)/px, bf=(small?11:12.5)/px, nf=(small?11:12)/px;
+function drawMap(svg,vb,cnt,b,near,inset){
+  const px=Math.max(.2,(svg.clientWidth||(inset?230:700))/vb[2]); // Bildschirm-Pixel pro Karteneinheit
+  const small=(svg.clientWidth||700)<520&&!inset;const br=(small?9.5:11)/px, bf=(small?11:12.5)/px, nf=(small?11:12)/px;
+  const inView=d=>d.x>vb[0]+4&&d.x<vb[0]+vb[2]-4&&d.y>vb[1]+4&&d.y<vb[1]+vb[3]-4;
   let shapes="",labels="",lines="";
   const badges=[];
   WIEN.b.forEach(d=>{
     const n=d.n,c=cnt[n]||0,name=BEZIRKE[n];
     const cls=["bz"];if(n===b)cls.push("sel");else if(near.includes(n))cls.push("near");
-    shapes+=`<g class="${cls.join(" ")}" data-bez="${n}" tabindex="0" role="button" aria-pressed="${n===b}" aria-label="${n}. Bezirk, ${esc(name)}: ${c} ${c===1?"Tier":"Tiere"}"><title>${1000+n*10} ${esc(name)} (${n}. Bezirk): ${c} ${c===1?"Tier":"Tiere"}</title><path d="${d.d}" style="fill:var(--q${bin(c)})"/></g>`;
+    shapes+=`<g class="${cls.join(" ")}" data-bez="${n}" tabindex="${inset?-1:0}" role="button" aria-pressed="${n===b}" aria-label="${1000+n*10} ${esc(name)}: ${c} ${c===1?"Tier":"Tiere"}"><title>${1000+n*10} ${esc(name)} (${n}. Bezirk): ${c} ${c===1?"Tier":"Tiere"}</title><path d="${d.d}" style="fill:var(--q${bin(c)})"/></g>`;
+    if(inset&&!inView(d))return;
     const room=d.r*px;
     const showNo=room>=20;
     if(showNo)labels+=`<text class="no" style="fill:#FFFFFF;stroke:#000000;stroke-opacity:.85;stroke-width:${3.2/px};paint-order:stroke;stroke-linejoin:round" x="${d.x}" y="${c?d.y-br-nf*.75:d.y}" font-size="${nf}">${1000+n*10}</text>`;
@@ -503,7 +510,16 @@ function renderMap(){
     labels+=`<g class="badge" transform="translate(${o.x.toFixed(1)} ${o.y.toFixed(1)})"><circle r="${o.r}" stroke-width="${1.5/px}"/><text font-size="${bf}">${o.c}</text></g>`;
   });
   labels=lines+labels;
-  svg.innerHTML=shapes+`<g class="lbl">${labels}</g>`;
+  const box=inset?"":`<rect class="insetbox" x="${INSET[0]}" y="${INSET[1]}" width="${INSET[2]}" height="${INSET[3]}" rx="${6/px}" stroke-width="${1.5/px}"/>`;
+  svg.innerHTML=shapes+box+`<g class="lbl">${labels}</g>`;
+}
+const INSET=[378,325,150,225];
+function renderMap(){
+  const svg=$("#wmap");if(!svg)return;
+  const cnt={};applyFilters(ANIMALS,"bez").forEach(a=>{if(a.bez)cnt[a.bez]=(cnt[a.bez]||0)+1});
+  const b=+state.bez,near=b?(NEIGH[b]||[]):[];
+  drawMap(svg,[0,0,WIEN.w,WIEN.h],cnt,b,near,false);
+  const ins=$("#wins");if(ins)drawMap(ins,INSET,cnt,b,near,true);
   const vm=$("#vmap");
   if(vm)vm.innerHTML=BEZIRKE.slice(1).map((name,i)=>{
     const n=i+1,c=cnt[n]||0,q=bin(c);
@@ -533,9 +549,9 @@ function reset(){
   $("#q").value="";["#bez","#col","#sex","#age"].forEach(s=>$(s).value="");
   render();
 }
-document.addEventListener("mouseover",e=>{if(matchMedia("(hover: none)").matches)return;const g=e.target.closest&&e.target.closest("#wmap .bz");const n=g?+g.dataset.bez:0;if(n!==mapHover){mapHover=n;updateInfo();}});
-document.addEventListener("focusin",e=>{const g=e.target.closest&&e.target.closest("#wmap .bz");if(g){mapHover=+g.dataset.bez;updateInfo();}});
-document.addEventListener("keydown",e=>{const g=e.target.closest&&e.target.closest("#wmap .bz");if(g&&(e.key==="Enter"||e.key===" ")){e.preventDefault();g.dispatchEvent(new MouseEvent("click",{bubbles:true}));}});
+document.addEventListener("mouseover",e=>{if(matchMedia("(hover: none)").matches)return;const g=e.target.closest&&e.target.closest("#wmap .bz,#wins .bz");const n=g?+g.dataset.bez:0;if(n!==mapHover){mapHover=n;updateInfo();}});
+document.addEventListener("focusin",e=>{const g=e.target.closest&&e.target.closest("#wmap .bz,#wins .bz");if(g){mapHover=+g.dataset.bez;updateInfo();}});
+document.addEventListener("keydown",e=>{const g=e.target.closest&&e.target.closest("#wmap .bz,#wins .bz");if(g&&(e.key==="Enter"||e.key===" ")){e.preventDefault();g.dispatchEvent(new MouseEvent("click",{bubbles:true}));}});
 function updateInfo(){const info=$("#mapinfo");if(!info)return;const b=+state.bez,show=mapHover||b;
   if(!show){info.textContent="Tippe auf einen Bezirk, um nur Tiere von dort zu sehen.";return;}
   const c=applyFilters(ANIMALS,"bez").filter(a=>a.bez===show).length;
