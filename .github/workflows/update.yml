@@ -75,6 +75,11 @@ jobs:
             git push
           fi
 
+      - name: Seite fuer Suchmaschinen vorbereiten
+        if: steps.due.outputs.run == 'true'
+        run: python scripts/seo.py
+        continue-on-error: true   # bei einem Fehler wird die Seite wie bisher veroeffentlicht
+
       - uses: actions/configure-pages@v5
         if: steps.due.outputs.run == 'true'
 
