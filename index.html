@@ -4,8 +4,22 @@
 <meta charset="utf-8">
 <meta name="color-scheme" content="light dark">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>tiergefunden.at – gefundene Tiere in Wien</title>
-<meta name="description" content="Alle in Wien gefundenen Haustiere mit Foto, Fundort und Kontakt. Nach Tierart, Bezirk und Farbe filtern. Daten der Stadt Wien, automatisch aktualisiert.">
+<title>Fundtiere Wien: alle gefundenen Tiere mit Foto | tiergefunden.at</title>
+<meta name="description" content="Hund oder Katze in Wien entlaufen? Alle beim Fundservice der Stadt Wien gemeldeten Fundtiere mit Foto, Fundort und Kontakt – nach Tierart und Bezirk filterbar.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://tiergefunden.at/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="tiergefunden.at">
+<meta property="og:locale" content="de_AT">
+<meta property="og:url" content="https://tiergefunden.at/">
+<meta property="og:title" content="Fundtiere Wien: alle gefundenen Tiere mit Foto | tiergefunden.at">
+<meta property="og:description" content="Alle beim Fundservice der Stadt Wien gemeldeten Fundtiere mit Foto. Nach Tierart und Bezirk filtern – kostenlos und ohne Anmeldung.">
+<meta property="og:image" content="https://tiergefunden.at/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="tiergefunden.at – alle Fundtiere in Wien">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"tiergefunden.at","url":"https://tiergefunden.at/","inLanguage":"de-AT","description":"Alle beim Fundservice der Stadt Wien gemeldeten Fundtiere mit Foto, Fundort und Kontakt."}</script>
 <style>
 :root{
   --bg:#EEF1EC; --card:#FFFFFF; --ink:#18302B; --muted:#5E6F69; --line:#CBD3CC;
@@ -323,7 +337,7 @@ footer p{margin:0 0 6px;max-width:80ch}
       </select>
     </label>
   </div>
-  <div class="grid" id="grid"></div>
+  <div class="grid" id="grid"><!--SSR--><!--/SSR--></div>
   </div>
 </main>
 
@@ -571,7 +585,7 @@ document.addEventListener("click",e=>{
 $("#q").addEventListener("input",e=>{state.q=e.target.value;render();});
 [["#bez","bez"],["#col","col"],["#sex","sex"],["#age","age"],["#sort","sort"]].forEach(([s,k])=>$(s).addEventListener("change",e=>{state[k]=e.target.value;render();}));
 $("#reset").addEventListener("click",reset);
-$("#grid").innerHTML=`<div class="empty"><p>Gefundene Tiere werden geladen …</p></div>`;
+if(!$("#grid").querySelector(".card"))$("#grid").innerHTML=`<div class="empty"><p>Gefundene Tiere werden geladen …</p></div>`;
 fetch("data.json",{cache:"no-cache"}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(d=>{
   ANIMALS=(d.animals||[]).map(prep);
   const up=new Date(d.updated);
