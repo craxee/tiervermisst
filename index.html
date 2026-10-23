@@ -2,6 +2,10 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#18302B">
 <meta name="color-scheme" content="light dark">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Fundtiere Wien: alle gefundenen Tiere mit Foto | tiergefunden.at</title>
@@ -20,6 +24,7 @@
 <meta property="og:image:alt" content="tiergefunden.at – alle Fundtiere in Wien">
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"tiergefunden.at","url":"https://tiergefunden.at/","inLanguage":"de-AT","description":"Alle beim Fundservice der Stadt Wien gemeldeten Fundtiere mit Foto, Fundort und Kontakt."}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"tiergefunden.at","url":"https://tiergefunden.at/","logo":"https://tiergefunden.at/logo-512.png"}</script>
 <style>
 :root{
   --bg:#EEF1EC; --card:#FFFFFF; --ink:#18302B; --muted:#5E6F69; --line:#CBD3CC;
@@ -48,7 +53,11 @@ a{color:inherit}
 .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
 
 /* Kopf */
-header{padding:44px 0 28px}
+header{padding:22px 0 28px}
+.brand{display:inline-flex;align-items:center;gap:10px;margin:0 0 26px;color:var(--ink);text-decoration:none;font-family:var(--display);font-weight:800;font-size:1.2rem;letter-spacing:-.01em}
+.brand svg{width:38px;height:38px;flex:none}
+.brand .tld{color:var(--muted);font-weight:700}
+.brand:focus-visible{outline:3px solid var(--focus);outline-offset:4px;border-radius:10px}
 .head{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end}
 h1{font-family:var(--display);font-weight:800;font-size:clamp(2.2rem,6vw,4rem);line-height:1;letter-spacing:-.02em;margin:0 0 14px;max-width:14ch}
 .lead{margin:0;color:var(--muted);max-width:60ch}
@@ -234,6 +243,7 @@ footer p{margin:0 0 6px;max-width:80ch}
 </head>
 <body>
 <header class="wrap">
+  <a class="brand" href="/" aria-label="tiergefunden.at – Startseite"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="#18302B"/><g fill="#E2B13C"><path d="M32 30.5c-6.6 0-13.5 8.6-13.5 14.6 0 4.3 3.4 6.2 7 5 2.4-.8 4.4-1.4 6.5-1.4s4.1.6 6.5 1.4c3.6 1.2 7-.7 7-5 0-6-6.9-14.6-13.5-14.6z"/><ellipse cx="14.6" cy="29" rx="4.9" ry="6.1" transform="rotate(-24 14.6 29)"/><ellipse cx="24.4" cy="17.6" rx="5.2" ry="6.7" transform="rotate(-8 24.4 17.6)"/><ellipse cx="39.6" cy="17.6" rx="5.2" ry="6.7" transform="rotate(8 39.6 17.6)"/><ellipse cx="49.4" cy="29" rx="4.9" ry="6.1" transform="rotate(24 49.4 29)"/></g></svg><span>tiergefunden<span class="tld">.at</span></span></a>
   <div class="head">
     <div>
       <h1>Dein Tier wird vermisst?</h1>
